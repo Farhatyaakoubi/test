@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 2  # Number of NGINX instances
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest  # Use the latest NGINX image
+        ports:
+        - containerPort: 80  # Expose port 80
+        # Uncomment the following line to add a custom NGINX configuration
+        # volumeMounts:
+        # - name: nginx-config
+        #   mountPath: /etc/nginx/conf.d
+      volumes:
+      # Uncomment the following section to use a ConfigMap for custom configuration
+      # - name: nginx-config
+      #   configMap:
+      #     name: nginx-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  type: NodePort  # Change to LoadBalancer if using a cloud provider
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30080  # Optional: specify a node port (between 30000-32767)
+  selector:
+    app: nginx
